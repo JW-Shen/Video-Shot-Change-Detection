@@ -1,0 +1,10 @@
+# Cache
+__pycache__
+.ipynb_checkpoints/
+.DS_Store
+
+# Data
+data/
+
+# Report
+書面報告.docx
