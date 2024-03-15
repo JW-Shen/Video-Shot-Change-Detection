@@ -158,6 +158,32 @@ def histogram_comparison(
 
     return hist_corr
 
+def frame_diff(
+    prev_frame: np.array,
+    curr_frame: np.array
+) -> float:
+    """
+    Frame difference comparision.
+
+    Parameters:
+        prev_frame: previous frame
+        curr_frame: current frame
+
+    Return:
+        diff_ratio: frame difference ratio between two frames
+    """
+    
+    prev_frame = cv2.cvtColor(prev_frame, cv2.COLOR_BGR2GRAY)
+    curr_frame = cv2.cvtColor(curr_frame, cv2.COLOR_BGR2GRAY)
+
+    frame_diff = cv2.absdiff(prev_frame, curr_frame)
+    _, frame_diff = cv2.threshold(frame_diff, 30, 255, cv2.THRESH_BINARY)
+
+    h, w = prev_frame.shape
+    diff_ratio = cv2.countNonZero(frame_diff) / (h * w)
+
+    return diff_ratio
+
 def ECR(
     prev_frame: np.array,
     curr_frame: np.array
@@ -361,6 +387,10 @@ def shot_change_detection(
             hist_corr = histogram_comparison(prev_frame, curr_frame)
             if hist_corr < threshold:
                 shot_cahnge.append(idx)
+        elif algorithm == "frame_diff":
+            diff_ratio = frame_diff(prev_frame, curr_frame)
+            if diff_ratio > threshold:
+                shot_cahnge.append(idx)
         elif algorithm == "ECR":
             ecr = ECR(prev_frame, curr_frame)
             if ecr > threshold:
@@ -410,6 +440,7 @@ def main(videoname: str, algorithm: str) -> None:
     threshold = {
         "climate": {
             "histogram": 0.8,
+            "frame_diff": 0.1,
             "ECR": 0.5,
             "motion": 2.3,
             "twin": 0.2,
@@ -417,6 +448,7 @@ def main(videoname: str, algorithm: str) -> None:
         },
         "news": {
             "histogram": 0.8,
+            "frame_diff": 0.22,
             "ECR": 0.3,
             "motion": 3.3,
             "twin": 0.2,
@@ -424,6 +456,7 @@ def main(videoname: str, algorithm: str) -> None:
         },
         "ngc": {
             "histogram": 0.85,
+            "frame_diff": 0.28,
             "ECR": 0.90,
             "motion": 3.2,
             "twin": 0.15,
@@ -432,7 +465,7 @@ def main(videoname: str, algorithm: str) -> None:
     }
 
     video_list = ["climate", "news", "ngc"]
-    algorithm_list = ["histogram", "ECR", "motion", "twin", "cnn"]
+    algorithm_list = ["histogram", "frame_diff", "ECR", "motion", "twin", "cnn"]
 
     assert videoname in (video_list+["all"]), "Error: unknown video name."
     assert algorithm in (algorithm_list+["all"]), "Error: unsupported algorithm."
