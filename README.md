@@ -8,7 +8,7 @@
     * Convolutional neural network (ResNet18)
 
 
-# Imput/Output
+## Imput/Output
 
 * Input: video
 * Output: frame number at which the shot change occurs
