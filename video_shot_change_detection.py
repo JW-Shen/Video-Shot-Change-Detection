@@ -1,3 +1,7 @@
+"""
+Video Shot Change Detection.
+Author: ChunWei Shen
+"""
 import cv2
 import argparse
 import numpy as np
@@ -8,7 +12,7 @@ from torch import Tensor
 import torch.nn.functional as F
 from torchvision import transforms, models
 
-from typing import List, Union, Dict, Any, Optional, Tuple
+from typing import List, Union, Tuple
 
 class ResNet18(nn.Module):
     """Create a resnet18 model to extract features."""
