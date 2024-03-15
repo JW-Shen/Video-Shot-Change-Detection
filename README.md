@@ -28,10 +28,10 @@
 ```bash
   python -m video_shot_change_detection --video-name ${video_name} --algorithm ${algorithm}
 ```
-<p>
-Replace `${video_name}` with the video file name<br />
-Replace `${algorithm}` with one of `histogram`, `ECR`, `motion`, `twin`, `cnn`
-</p>
+
+Replace `${video_name}` with the video file name <br />
+Replace `${algorithm}` with one of `histogram`, `ECR`, `motion`, `twin`, `cnn`, `all`
+
 
 ## Result
 
