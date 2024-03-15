@@ -28,8 +28,10 @@
 ```bash
   python -m video_shot_change_detection --video-name ${video_name} --algorithm ${algorithm}
 ```
-Replace `${video_name}` with one of `METR-LA`, `PEMS-BAY`, `PEMS03`, `PEMS04`, `PEMS07`, `PEMS08`
-
+<p>
+Replace `${video_name}` with the video file name<br />
+Replace `${algorithm}` with one of `histogram`, `ECR`, `motion`, `twin`, `cnn`
+</p>
 
 ## Result
 
