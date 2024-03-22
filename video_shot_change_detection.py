@@ -12,7 +12,7 @@ from torch import Tensor
 import torch.nn.functional as F
 from torchvision import transforms, models
 
-from typing import List, Union, Tuple
+from typing import List, Dict, Union, Tuple
 
 class ResNet18(nn.Module):
     """Create a resnet18 model to extract features."""
@@ -341,7 +341,7 @@ def post_process(shot_cahnge: List[int], filter: int = 30) -> List[int]:
 def shot_change_detection(
     videoname: str, 
     algorithm: str = "histogram", 
-    threshold: float = 0.5
+    threshold: Union[float, Dict] = 0.5,
 ) -> List[int]:
     """
     Shot change detection.
@@ -375,7 +375,7 @@ def shot_change_detection(
     shot_cahnge = []
     accumulate = None
     idx = 2 if videoname == "climate" else 1
-    model = ResNet18() if algorithm == "cnn" else None
+    model = ResNet18() if algorithm in ["cnn", "ensemble"] else None
 
     ret, prev_frame = cap.read()
 
@@ -407,7 +407,23 @@ def shot_change_detection(
             l1_dis = cnn(model, prev_frame, curr_frame)
             if l1_dis > threshold:
                 shot_cahnge.append(idx)
-            # print(idx, l1_dis)
+        elif algorithm == "ensemble":
+            hist_corr = histogram_comparison(prev_frame, curr_frame)
+            diff_ratio = frame_diff(prev_frame, curr_frame)
+            ecr = ECR(prev_frame, curr_frame)
+            motion_l1_dis = motion_vectors(prev_frame, curr_frame)
+            change, accumulate = twin_comparison(prev_frame, curr_frame, threshold["twin"], threshold["twin"]/5, accumulate)
+            cnn_l1_dis = cnn(model, prev_frame, curr_frame)
+            voting = (
+                int(hist_corr < threshold["histogram"]) + 
+                int(diff_ratio > threshold["frame_diff"]) + 
+                int(ecr > threshold["ECR"]) +
+                int(motion_l1_dis > threshold["motion"]) +
+                int(change) +
+                int(cnn_l1_dis > threshold["cnn"])
+            )
+            if voting >= 3:
+                shot_cahnge.append(idx)
             
         prev_frame = curr_frame
         idx += 1
@@ -468,18 +484,24 @@ def main(videoname: str, algorithm: str) -> None:
     algorithm_list = ["histogram", "frame_diff", "ECR", "motion", "twin", "cnn"]
 
     assert videoname in (video_list+["all"]), "Error: unknown video name."
-    assert algorithm in (algorithm_list+["all"]), "Error: unsupported algorithm."
+    assert algorithm in (algorithm_list+["ensemble", "all"]), "Error: unsupported algorithm."
 
     if videoname == "all":
         for video in video_list:
             if algorithm == "all":
                 for alg in algorithm_list:
                     shot_cahnge = shot_change_detection(video, algorithm=alg, threshold=threshold[video][alg])
+                shot_cahnge = shot_change_detection(video, algorithm="ensemble", threshold=threshold[video])
+            elif algorithm == "ensemble":
+                shot_cahnge = shot_change_detection(video, algorithm="ensemble", threshold=threshold[video])
             else:
                 shot_cahnge = shot_change_detection(video, algorithm=algorithm, threshold=threshold[video][algorithm])
     elif algorithm == "all":
         for alg in algorithm_list:
             shot_cahnge = shot_change_detection(videoname, algorithm=alg, threshold=threshold[videoname][alg])
+        shot_cahnge = shot_change_detection(video, algorithm="ensemble", threshold=threshold[video])
+    elif algorithm == "ensemble":
+        shot_cahnge = shot_change_detection(video, algorithm="ensemble", threshold=threshold[video])
     else:
         shot_cahnge = shot_change_detection(videoname, algorithm=algorithm, threshold=threshold[videoname][algorithm])
 

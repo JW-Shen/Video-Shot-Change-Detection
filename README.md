@@ -9,6 +9,7 @@
     | Motion Vectors               | calculate L1 distance of motion vectors between two frames |
     | Twin-Comparison Approach     | aply twin-comparison approach based on color histogram |
     | Convolutional neural network | calculate L1 distance of extracted features between two frames |
+    | Ensemble                     | using the above six algorithms for voting |
 
 ## Imput/Output
 
@@ -32,7 +33,7 @@
 ```
 
 Replace `${video_name}` with the video file name <br />
-Replace `${algorithm}` with one of `histogram`, `frame_diff`, `ECR`, `motion`, `twin`, `cnn`, `all`
+Replace `${algorithm}` with one of `histogram`, `frame_diff`, `ECR`, `motion`, `twin`, `cnn`, `ensemble`, `all`
 
 
 ## Result
@@ -47,6 +48,7 @@ Replace `${algorithm}` with one of `histogram`, `frame_diff`, `ECR`, `motion`, `
     | Motion Vectors               | 0.818     | 0.600   | 0.692    |
     | Twin-Comparison Approach     | 0.923     | 0.800   | 0.857    |
     | Convolutional neural network | 0.765     | 0.867   | 0.812    |
+    | Ensemble                     | 0.917     | 0.733   | 0.815    |
 
 * Video: news.mpg 
 
@@ -58,6 +60,7 @@ Replace `${algorithm}` with one of `histogram`, `frame_diff`, `ECR`, `motion`, `
     | Motion Vectors               | 0.833     | 0.714   | 0.769    |
     | Twin-Comparison Approach     | 1.000     | 1.000   | 1.000    |
     | Convolutional neural network | 1.000     | 0.857   | 0.923    |
+    | Ensemble                     | 1.000     | 1.000   | 1.000    |
 
 * Video: ngc.mpeg (National Geographic)
 
@@ -69,3 +72,4 @@ Replace `${algorithm}` with one of `histogram`, `frame_diff`, `ECR`, `motion`, `
     | Motion Vectors               | 0.690     | 0.556   | 0.615    |
     | Twin-Comparison Approach     | 0.763     | 0.806   | 0.784    |
     | Convolutional neural network | 0.963     | 0.722   | 0.825    |
+    | Ensemble                     | 0.962     | 0.694   | 0.806    |
